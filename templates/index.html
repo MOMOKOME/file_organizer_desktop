@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="フォルダ内のファイルを拡張子別に安全に整理するローカルWebアプリ">
+  <title>File Organizer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="img">
+          <path d="M7 13.5A4.5 4.5 0 0 1 11.5 9h8l4 4h13A4.5 4.5 0 0 1 41 17.5v17A4.5 4.5 0 0 1 36.5 39h-25A4.5 4.5 0 0 1 7 34.5z"/>
+          <path class="brand-mark-line" d="M16 25h16M24 19l-6 6 6 6"/>
+        </svg>
+      </div>
+      <div>
+        <p class="eyebrow">LOCAL FILE UTILITY</p>
+        <h1>File Organizer</h1>
+        <p class="hero-copy">散らかったファイルを、拡張子ごとのフォルダへ安全に整理します。</p>
+      </div>
+      <div class="local-badge"><span></span> このPC内だけで処理</div>
+    </header>
+
+    <main>
+      <nav class="stepper" aria-label="操作手順">
+        <div class="step is-active" data-step="1"><span>1</span><strong>フォルダ選択</strong></div>
+        <div class="step-line"></div>
+        <div class="step" data-step="2"><span>2</span><strong>予定を確認</strong></div>
+        <div class="step-line"></div>
+        <div class="step" data-step="3"><span>3</span><strong>整理を実行</strong></div>
+      </nav>
+
+      <div id="errorBanner" class="alert alert-error" role="alert" hidden>
+        <strong>エラー</strong>
+        <span id="errorMessage"></span>
+        <button id="closeError" class="icon-button" type="button" aria-label="エラーを閉じる">×</button>
+      </div>
+
+      <section class="panel folder-panel" aria-labelledby="folderHeading">
+        <div class="section-heading">
+          <div class="section-number">1</div>
+          <div>
+            <h2 id="folderHeading">整理するフォルダを選択</h2>
+            <p>選択したフォルダ直下のファイルだけが対象です。サブフォルダは変更しません。</p>
+          </div>
+        </div>
+
+        <div class="folder-selector">
+          <div class="folder-path-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.8A1.8 1.8 0 0 1 4.8 5h5l2 2h7.4A1.8 1.8 0 0 1 21 8.8v8.4a1.8 1.8 0 0 1-1.8 1.8H4.8A1.8 1.8 0 0 1 3 17.2z"/></svg>
+            <input id="folderPath" type="text" placeholder="フォルダを選択、またはパスを入力" aria-label="選択中のフォルダ">
+          </div>
+          <button id="selectFolderButton" class="button button-secondary" type="button">
+            フォルダ選択
+          </button>
+          <button id="previewButton" class="button button-primary" type="button" disabled>
+            整理予定を見る
+          </button>
+        </div>
+        <p class="helper-text">「フォルダ選択」を押すとWindowsの選択画面が開きます。パスを直接貼り付けることもできます。</p>
+      </section>
+
+      <section id="previewSection" class="panel" aria-labelledby="previewHeading">
+        <div class="section-heading section-heading-split">
+          <div class="section-heading-main">
+            <div class="section-number">2</div>
+            <div>
+              <h2 id="previewHeading">整理予定プレビュー</h2>
+              <p>実際に移動する前に、移動先を確認できます。</p>
+            </div>
+          </div>
+          <div id="previewBadge" class="count-badge" hidden><strong>0</strong> 件</div>
+        </div>
+
+        <div id="previewEmpty" class="empty-state">
+          <div class="empty-illustration" aria-hidden="true">
+            <svg viewBox="0 0 96 72"><path class="empty-folder-back" d="M12 22a6 6 0 0 1 6-6h20l8 8h32a6 6 0 0 1 6 6v28a6 6 0 0 1-6 6H18a6 6 0 0 1-6-6z"/><path class="empty-folder-front" d="M10 33h76l-8 29H18z"/><path class="empty-arrow" d="M48 36v17m0 0-7-7m7 7 7-7"/></svg>
+          </div>
+          <h3>まだ整理予定はありません</h3>
+          <p>フォルダを選択して「整理予定を見る」を押してください。</p>
+        </div>
+
+        <div id="previewContent" hidden>
+          <div id="previewNotice" class="alert alert-warning" hidden>
+            <strong>確認してください</strong>
+            <span id="previewNoticeText"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>現在のファイル</th><th>拡張子</th><th>移動先</th></tr></thead>
+              <tbody id="previewRows"></tbody>
+            </table>
+          </div>
+          <div id="previewFailures" class="inline-errors" hidden>
+            <h3>プレビュー時のエラー</h3>
+            <ul id="previewFailureList"></ul>
+          </div>
+          <div class="action-row">
+            <div class="safe-note">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.3c0 4.6 3.2 8.8 7.5 9.7 4.3-.9 7.5-5.1 7.5-9.7V6z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg>
+              同名ファイルは上書きせず、末尾に番号を付けます。
+            </div>
+            <button id="organizeButton" class="button button-success" type="button" disabled>整理開始</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="progressSection" class="panel" aria-labelledby="progressHeading" hidden>
+        <div class="section-heading">
+          <div class="section-number">3</div>
+          <div>
+            <h2 id="progressHeading">処理状況</h2>
+            <p id="progressStatus">整理を開始しています…</p>
+          </div>
+        </div>
+        <div class="progress-meta"><span id="currentFile">準備中</span><strong id="progressPercent">0%</strong></div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+        <p id="progressCount" class="progress-count">0 / 0 件</p>
+      </section>
+
+      <section id="resultSection" class="panel result-panel" aria-labelledby="resultHeading" hidden>
+        <div class="result-heading">
+          <div id="resultIcon" class="result-icon" aria-hidden="true">✓</div>
+          <div>
+            <p class="eyebrow">RESULT</p>
+            <h2 id="resultHeading">整理が完了しました</h2>
+            <p id="resultDescription">処理結果を確認してください。</p>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card summary-success"><span>成功</span><strong id="successCount">0</strong><small>件</small></div>
+          <div class="summary-card summary-failure"><span>失敗</span><strong id="failureCount">0</strong><small>件</small></div>
+          <div class="summary-card summary-total"><span>処理済み</span><strong id="processedCount">0</strong><small>件</small></div>
+        </div>
+
+        <div id="successResults" class="result-list" hidden>
+          <h3>成功したファイル</h3>
+          <div class="table-wrap">
+            <table><thead><tr><th>ファイル</th><th>移動先</th></tr></thead><tbody id="successRows"></tbody></table>
+          </div>
+        </div>
+
+        <div id="failureResults" class="result-list result-list-error" hidden>
+          <h3>失敗したファイル</h3>
+          <div class="table-wrap">
+            <table><thead><tr><th>ファイル</th><th>エラー内容</th></tr></thead><tbody id="failureRows"></tbody></table>
+          </div>
+        </div>
+
+        <div class="action-row action-row-end">
+          <button id="startOverButton" class="button button-secondary" type="button">別のフォルダを整理する</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>File Organizer · ファイルは外部へ送信されません</footer>
+  </div>
+
+  <dialog id="confirmDialog" class="confirm-dialog">
+    <form method="dialog">
+      <div class="dialog-icon" aria-hidden="true">→</div>
+      <h2>整理を開始しますか？</h2>
+      <p><strong id="confirmCount">0件</strong> のファイルを、表示された移動先へ整理します。</p>
+      <div class="dialog-note">処理中はブラウザを閉じないでください。</div>
+      <div class="dialog-actions">
+        <button class="button button-secondary" value="cancel">キャンセル</button>
+        <button id="confirmStartButton" class="button button-success" value="default">整理を開始する</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
