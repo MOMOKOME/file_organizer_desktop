@@ -1,6 +1,6 @@
 """file_organizer の CLI 入口。"""
 
-from organizer import organize_folder
+from organizer_service import organize_with_history as organize_folder
 
 
 def main() -> None:

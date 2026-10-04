@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>File Organizer Workspace mock — 2. プレビュー後</title>
+<link rel="stylesheet" href="workspace_mock.css">
+<link rel="stylesheet" href="mock_viewer.css">
+</head>
+<body>
+<nav class="mock-nav">Workspace mock（静的・機能なし）： <a href="workspace_initial.html">1. 初期画面</a> | <a href="workspace_preview.html" aria-current="page">2. プレビュー後</a> | <a href="workspace_done.html">3. 整理完了後</a></nav>
+<div class="win">
+  <div class="tb">
+    <svg class="i" viewBox="0 0 24 24" style="width: 14px; height: 14px; color: #3159b8"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path></svg>
+    <span>File Organizer 3.2.0</span>
+    <div class="ctl" aria-hidden="true">
+      <span><svg viewBox="0 0 10 10"><path d="M0 5h10"></path></svg></span>
+      <span><svg viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9"></rect></svg></span>
+      <span><svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0 0 10"></path></svg></span>
+    </div>
+  </div>
+
+  <header class="ab">
+    <div class="brand">
+      <div class="mark"><svg class="i" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path><path d="M8 13h8m-3-3 3 3-3 3"></path></svg></div>
+      <div><h1>File Organizer</h1><p>ファイル整理を、かんたんに。</p></div>
+    </div>
+    <nav class="steps" aria-label="操作手順">
+      <div class="st done"><span class="n"><svg class="i" viewBox="0 0 24 24"><path d="m5 12 4.5 4.5L19 7"></path></svg></span>フォルダと方法を選ぶ</div>
+      <div class="ln on"></div>
+      <div class="st active" aria-current="step"><span class="n">2</span>移動先を確認</div>
+      <div class="ln"></div>
+      <div class="st"><span class="n">3</span>整理を実行</div>
+    </nav>
+    <div></div>
+  </header>
+
+  <main class="main">
+    <div class="panes">
+      <section class="side" aria-label="整理の設定">
+        <div class="fld">
+          <label class="lbl" for="m1-folder">整理したいフォルダ</label>
+          <div class="row">
+            <input id="m1-folder" class="inp" type="text" value="C:\Users\User\Downloads" placeholder="フォルダを選択、またはパスを入力">
+            <button class="btn btn-sec" type="button">フォルダを選択</button>
+          </div>
+          <p class="hint">フォルダ直下のファイルだけを整理します。サブフォルダ内は変更しません。</p>
+        </div>
+        <fieldset class="fld" style="border: 0; margin: 0; padding: 0; min-width: 0">
+          <legend class="lbl" style="padding: 0; margin-bottom: 6px">整理方法</legend>
+          <div class="rules">
+            <label class="rc"><input type="radio" name="m1-rule"><span><b>拡張子別</b><small>jpg / pdf / txt など、拡張子ごとのフォルダへ</small></span></label>
+            <label class="rc on"><input type="radio" name="m1-rule" checked><span><b>ファイル種類別</b><small>画像 / 動画 / 文書 / 音声など、種類ごとのフォルダへ</small></span></label>
+          </div>
+        </fieldset>
+        <div class="fld">
+          <label class="lbl" for="m1-ex">除外する拡張子<span class="opt">任意</span></label>
+          <input id="m1-ex" class="inp" type="text" value=".exe, .tmp" placeholder=".exe, .tmp">
+          <div class="save"><button class="btn btn-quiet" type="button">設定を保存</button><span>設定を保存しました。</span></div>
+        </div>
+        <div class="go">
+          <button class="btn btn-sec btn-lg" type="button">整理予定を見る</button>
+          <p class="safe"><svg class="i" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8.2 7 10 4-1.8 7-5.5 7-10V6Z"></path><path d="m9 12 2 2 4-4"></path></svg>プレビューではファイルを移動しません</p>
+        </div>
+      </section>
+
+      <section class="cv" aria-labelledby="m1-ph">
+        <div class="cv-h">
+          <div>
+            <p class="eyebrow" style="font-size: 12px; color: #23468f; margin: 0 0 4px"><span class="dot"></span>移動先を確認したら、「整理を実行」を押してください。</p>
+            <h2 id="m1-ph">整理予定プレビュー</h2>
+            <p>移動するファイルと移動先を確認してください。</p>
+          </div>
+          <span class="badge"><b>12</b> 件の移動予定</span>
+        </div>
+        <div class="kpis">
+          <div class="kpi primary"><span>移動予定</span><strong>12</strong><em>件</em></div>
+          <div class="kpi"><span>除外設定で対象外</span><strong>2</strong><em>件</em></div>
+          <div class="kpi"><span>予定作成時の問題</span><strong>0</strong><em>件</em></div>
+        </div>
+        <div class="tw" tabindex="0" role="region" aria-label="移動予定一覧">
+          <table>
+            <thead><tr><th style="width: 40%">現在のファイル</th><th style="width: 13%">拡張子</th><th>移動先</th></tr></thead>
+            <tbody>
+              <tr><td class="fn">IMG_2041.jpg</td><td><span class="ext">.jpg</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>画像\IMG_2041.jpg</span></td></tr>
+              <tr><td class="fn">IMG_2042.jpg</td><td><span class="ext">.jpg</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>画像\IMG_2042.jpg</span></td></tr>
+              <tr><td class="fn">screenshot_0915.png</td><td><span class="ext">.png</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>画像\screenshot_0915.png</span></td></tr>
+              <tr><td class="fn">見積書_2026-09.pdf</td><td><span class="ext">.pdf</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>文書\見積書_2026-09.pdf</span></td></tr>
+              <tr><td class="fn">meeting_notes.txt</td><td><span class="ext">.txt</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>文書\meeting_notes.txt</span></td></tr>
+              <tr><td class="fn">売上集計.xlsx</td><td><span class="ext">.xlsx</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>文書\売上集計.xlsx</span></td></tr>
+              <tr><td class="fn">holiday_trip.mp4</td><td><span class="ext">.mp4</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>動画\holiday_trip.mp4</span></td></tr>
+              <tr><td class="fn">voice_memo.m4a</td><td><span class="ext">.m4a</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>音声\voice_memo.m4a</span></td></tr>
+              <tr><td class="fn">bgm_loop.mp3</td><td><span class="ext">.mp3</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>音声\bgm_loop.mp3</span></td></tr>
+              <tr><td class="fn">project_backup.zip</td><td><span class="ext">.zip</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>圧縮ファイル\project_backup.zip</span></td></tr>
+              <tr><td class="fn">logo_draft.svg</td><td><span class="ext">.svg</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>画像\logo_draft.svg</span></td></tr>
+              <tr><td class="fn">setup_notes.md</td><td><span class="ext">.md</span></td><td><span class="dest"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg>文書\setup_notes.md</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="cv-f">
+          <p class="safe"><svg class="i" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8.2 7 10 4-1.8 7-5.5 7-10V6Z"></path><path d="m9 12 2 2 4-4"></path></svg>同名ファイルは上書きせず、末尾に番号を付けます。</p>
+          <button class="btn btn-pri btn-lg btn-cta" type="button">整理を実行<svg class="i" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></svg></button>
+        </div>
+      </section>
+    </div>
+
+    <section class="hist" aria-labelledby="m1-hh">
+      <div class="hh">
+        <div><h2 id="m1-hh">履歴と元に戻す</h2></div>
+        <p>直前の整理を確認して、ファイルを元の場所へ戻せます。</p>
+        <div class="sp">
+          <span class="avail">整理履歴ができると、ここから元に戻せます。</span>
+          <button class="btn btn-quiet" type="button">履歴を更新</button>
+          <button class="btn btn-undo" type="button" disabled>直前の整理を元に戻す</button>
+        </div>
+      </div>
+      <div class="hl">
+        <div class="hempty"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l3 2"></path></svg><span><b>まだ整理履歴はありません。</b>　整理すると、日時・対象フォルダ・結果がここに表示されます。</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sb">
+    <div><svg class="i" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>このPC内だけで処理します。ファイルは外部へ送信されません。</div>
+    <div>MOMONGA Lab · v3.2.0</div>
+  </footer>
+</div>
+</body>
+</html>

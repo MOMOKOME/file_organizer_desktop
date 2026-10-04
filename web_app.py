@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import argparse
 import os
+import sqlite3
+from pathlib import Path
 import webbrowser
 from threading import Timer
 from typing import Callable, Optional
 
 from flask import Flask, jsonify, render_template, request
+
+from local_state import LocalState
+from app_config import resource_path, VERSION, BRAND
+from organization_rules import normalize_options
 
 from organizer_service import (
     JobManager,
@@ -23,19 +29,22 @@ def create_app(
     preview_store: Optional[PreviewStore] = None,
     job_manager: Optional[JobManager] = None,
     folder_picker: Optional[Callable[[], Optional[str]]] = None,
+    data_directory=None,
 ) -> Flask:
     """テストや将来の別UIからも利用できるFlaskアプリを作成する。"""
 
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder=str(resource_path("templates")),
+                static_folder=str(resource_path("static")))
     app.json.ensure_ascii = False
 
     previews = preview_store or PreviewStore()
-    jobs = job_manager or JobManager()
+    jobs = job_manager or JobManager(LocalState(data_directory))
+    state = jobs.state
     pick_folder = folder_picker or select_folder_native
 
     @app.get("/")
     def index():
-        return render_template("index.html")
+        return render_template("index.html", version=VERSION, brand=BRAND)
 
     @app.get("/api/health")
     def health():
@@ -48,24 +57,39 @@ def create_app(
             return jsonify({"cancelled": folder is None, "folder": folder})
         except Exception as error:
             app.logger.exception("Windowsフォルダ選択の呼び出しに失敗しました")
-            return jsonify({"error": f"フォルダ選択を開けませんでした: {error}"}), 500
+            return jsonify({"error": "フォルダ選択を開けませんでした。フォルダパスを直接入力してください。"}), 500
 
     @app.post("/api/preview")
     def create_preview():
         payload = request.get_json(silent=True) or {}
-        folder = str(payload.get("folder", "")).strip()
+        if not isinstance(payload, dict):
+            return jsonify({"error": "入力内容の形式が正しくありません。"}), 400
+        if not isinstance(payload.get("folder", ""), str):
+            return jsonify({"error": "フォルダパスを文字列で指定してください。"}), 400
+        folder = payload.get("folder", "").strip()
         if not folder:
             return jsonify({"error": "整理するフォルダを選択してください。"}), 400
 
         try:
-            preview = previews.create(folder)
+            options = state.settings()
+            options.update({key: payload[key] for key in ("rule", "excluded_extensions") if key in payload})
+            options = normalize_options(**options)
+            target = Path(folder).expanduser().resolve()
+            if target == state.directory or state.directory in target.parents:
+                return jsonify({"error": "履歴の保存フォルダは整理できません。"}), 400
+            preview = previews.create(folder, **options)
+            state.save_settings(**options)
             return jsonify(preview_to_dict(preview))
-        except (OSError, RuntimeError, ValueError) as error:
-            return jsonify({"error": f"整理予定を作成できませんでした: {error}"}), 400
+        except ValueError as error:
+            return jsonify({"error": str(error)}), 400
+        except (OSError, RuntimeError):
+            return jsonify({"error": "フォルダにアクセスできません。場所と権限を確認してください。"}), 400
 
     @app.post("/api/jobs")
     def start_job():
         payload = request.get_json(silent=True) or {}
+        if not isinstance(payload, dict):
+            return jsonify({"error": "入力内容の形式が正しくありません。"}), 400
         preview_id = str(payload.get("preview_id", "")).strip()
         if not preview_id:
             return jsonify({"error": "整理予定が指定されていません。"}), 400
@@ -88,6 +112,53 @@ def create_app(
         if job is None:
             return jsonify({"error": "処理状況が見つかりません。"}), 404
         return jsonify(job_to_dict(job))
+
+    @app.errorhandler(OSError)
+    @app.errorhandler(sqlite3.Error)
+    def storage_error(error):
+        app.logger.exception("Local storage operation failed")
+        return jsonify({"error": "ローカルデータを読み書きできません。保存先の権限と空き容量を確認してください。"}), 503
+
+    @app.get("/api/settings")
+    def get_settings():
+        return jsonify(state.settings())
+
+    @app.post("/api/settings")
+    def save_settings():
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict) or set(payload) - {"rule", "excluded_extensions"}:
+            return jsonify({"error": "整理ルールと除外拡張子を正しい形式で指定してください。"}), 400
+        try:
+            options = state.settings()
+            options.update(payload)
+            return jsonify(state.save_settings(**options))
+        except ValueError as error:
+            return jsonify({"error": str(error)}), 400
+
+    @app.get("/api/history")
+    def history():
+        return jsonify({"history": state.history()[:50]})
+
+    @app.get("/api/history/<run_id>/undo-preview")
+    def undo_preview(run_id):
+        if state.get_run(run_id) is None:
+            return jsonify({"error": "実行履歴が見つかりません。"}), 404
+        try:
+            return jsonify(jobs.undo_preview(run_id))
+        except ValueError as error:
+            return jsonify({"error": str(error)}), 409
+
+    @app.post("/api/history/<run_id>/undo")
+    def undo(run_id):
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict) or payload.get("confirmed") is not True:
+            return jsonify({"error": "元に戻す対象を確認してから実行してください。"}), 400
+        if state.get_run(run_id) is None:
+            return jsonify({"error": "実行履歴が見つかりません。"}), 404
+        try:
+            return jsonify(jobs.undo(run_id))
+        except ValueError as error:
+            return jsonify({"error": str(error)}), 409
 
     return app
 

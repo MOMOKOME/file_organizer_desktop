@@ -9,6 +9,7 @@ htmlcov/
 
 # Local virtual environments
 .venv/
+.venv-build/
 venv/
 env/
 ENV/
@@ -17,3 +18,12 @@ ENV/
 .env
 .env.*
 !.env.example
+
+# PyInstaller build outputs
+build/
+dist/
+
+# Local verification output and app data
+.verification-desktop/
+.verification-simple/
+.organizer_data/
