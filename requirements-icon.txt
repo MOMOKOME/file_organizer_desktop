@@ -1,0 +1,2 @@
+# Developer-only: regenerate icons/app.ico with icons/build_icon.py. Not needed to run or build the app.
+Pillow>=11,<13
