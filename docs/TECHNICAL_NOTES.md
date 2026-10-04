@@ -17,6 +17,8 @@ README から移した、開発者向けの詳細資料です。UI を変更す�
 - `build_windows.bat` は `.venv-build` を作り、依存のインストール、全テスト、PyInstaller ビルドを順に実行します。成功/失敗を表示し、失敗時は停止します。Python 実行ファイルは `FILE_ORGANIZER_BUILD_PYTHON` で指定できます。自動実行では `build_windows.bat --no-pause` を使用します。
 - 成果物は `dist/File Organizer/File Organizer.exe` です。`_internal` を含む `dist/File Organizer` フォルダ全体を配布します。
 - onedir 方式、`console=False`、UPX 無効。Python ランタイム、SQLite、Flask、pywebview の DLL、`templates/`、`static/` を含みます。リソースは開発時のモジュール位置、または `_MEIPASS` から解決します。
+- `FileOrganizer.spec` は、pywebview のビルド用フック（`webview.__pyinstaller`）と、実行時に使わないビルドツール（PyInstaller 本体・setuptools など）を配布物から除外しています。PyInstaller 本体のビルド用モジュールは GPL で、ブートローダー例外の対象外のためです。除外を外すと、`THIRD_PARTY_NOTICES.md` の前提が変わります。
+- `python tools/make_release_zip.py` は、利用条件・プライバシー・第三者ライセンスの文書を exe の隣に配置し、`dist/release-<版>/` に配布 ZIP と `SHA256SUMS.txt` を作ります。
 - `icons/app.ico` を配置して再ビルドすると、exe とウィンドウのアイコンに反映されます。未配置でも標準アイコンでビルドできます。
 - 依存は `requirements.txt`（Web/CLI）、`requirements-desktop.txt`（専用ウィンドウ）、`requirements-build.txt`（ビルド・テスト）、`requirements-ui-test.txt`（任意の UI テスト）に分かれています。
 

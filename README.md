@@ -86,6 +86,9 @@ node --check static/app.js
 
 # Windows 配布ビルド（dist/File Organizer/ に出力）
 python -m PyInstaller --noconfirm --clean FileOrganizer.spec
+
+# 配布用 ZIP と SHA256（利用条件・第三者ライセンスを同梱し dist/release-<版>/ に出力）
+python tools/make_release_zip.py
 ```
 
 `build_windows.bat` を使うと、専用の仮想環境の作成・依存のインストール・全テスト・ビルドを順に実行します。
@@ -111,6 +114,15 @@ python -m PyInstaller --noconfirm --clean FileOrganizer.spec
 - [UI_DESIGN_HANDOFF.md](UI_DESIGN_HANDOFF.md) — UI を変更する際に守る ID・API 契約
 - [design_mockups/](design_mockups/) — 採用した Workspace デザインのモックと引き継ぎ資料
 - [PHASE2_VERIFICATION.md](PHASE2_VERIFICATION.md) / [PHASE3A_VERIFICATION.md](PHASE3A_VERIFICATION.md) — 開発フェーズごとの検証記録
+
+## 利用条件
+
+- File Organizer は MOMONGA Lab のソフトウェアです。著作権は MOMONGA Lab に帰属します。
+- 公式配布版（MOMONGA Lab が指定する販売ページ・配布ページから入手したもの）は、個人での利用と、企業・団体などの組織内での利用ができます。利用台数は購入時に示された条件に従い、特に示されていない場合は 1 台です。
+- このリポジトリはソースコード閲覧用で、完成版の公式の配布場所ではありません。ソースコードは閲覧・学習や、自分だけが使う目的でのローカルビルドに利用できます。
+- 無断での再配布・転売、ビルドしたものや改変版の配布・販売はできません。
+- 詳しくは [TERMS_OF_USE.md](TERMS_OF_USE.md) をご確認ください。
+- プライバシー: [PRIVACY.md](PRIVACY.md) ／ 第三者ソフトウェア: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
 ## Status
 
