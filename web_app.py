@@ -13,7 +13,7 @@ from typing import Callable, Optional
 from flask import Flask, jsonify, render_template, request
 
 from local_state import LocalState
-from app_config import resource_path, VERSION, BRAND
+from app_config import resource_path, VERSION, BRAND, EDITION, EDITIONS
 from organization_rules import normalize_options
 
 from organizer_service import (
@@ -30,6 +30,7 @@ def create_app(
     job_manager: Optional[JobManager] = None,
     folder_picker: Optional[Callable[[], Optional[str]]] = None,
     data_directory=None,
+    edition: Optional[str] = None,
 ) -> Flask:
     """テストや将来の別UIからも利用できるFlaskアプリを作成する。"""
 
@@ -41,10 +42,13 @@ def create_app(
     jobs = job_manager or JobManager(LocalState(data_directory))
     state = jobs.state
     pick_folder = folder_picker or select_folder_native
+    # Editions differ only in the screen template; every API below is shared.
+    edition = edition if edition in EDITIONS else EDITION
+    template = "classic/index.html" if edition == "classic" else "index.html"
 
     @app.get("/")
     def index():
-        return render_template("index.html", version=VERSION, brand=BRAND)
+        return render_template(template, version=VERSION, brand=BRAND, app_name=EDITIONS[edition])
 
     @app.get("/api/health")
     def health():

@@ -125,3 +125,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tests/test_desktop_exe.ps1
 ## 11. 進行中のタスク
 
 - **Simple テーマの GUI 刷新（Workspace 案）**: 仕様は `design_mockups/WORKSPACE_HANDOFF.md`、見た目の正解は `design_mockups/` のモックとスクリーンショット。
+- **Classic Edition（追加GUI商品）**: 仕様は `design_mockups/classic/CLASSIC_HANDOFF.md`、見た目の正解は `design_mockups/classic/screenshots/`。最初のプロンプトは `design_mockups/classic/CLAUDE_CODE_PROMPT.md`。

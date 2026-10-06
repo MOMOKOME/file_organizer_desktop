@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ja" data-theme="classic">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="整理予定を確認してから、ファイルを安全に整理。">
+<title>{{ app_name }}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='classic/classic.css') }}">
+</head>
+<body>
+<a class="skip-link" href="#folderPath">フォルダー選択へ移動</a>
+<div class="classic-shell">
+<aside class="sidebar">
+<div class="sidebar-brand">
+<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 27C16 27 25 19 27 5 15 6 7 14 7 26"/><path d="M6 27 19 14"/><path d="M12 21c-2-1-4-1-6 0"/><path d="M16 17c-1-2-1-5 0-7"/></svg>
+<div class="brand-text"><p class="brand-name">File Organizer</p><p class="brand-tagline">大切なファイルを、すっきりと</p></div>
+</div>
+<nav class="sidebar-nav" aria-label="メニュー">
+<button class="nav-item" type="button" data-view="organize" aria-controls="classicViewOrganize" aria-current="page" title="整理する"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><span class="nav-text"><strong>整理する</strong><small>ファイルを整理・分類</small><small class="nav-busy">処理中</small></span></button>
+<button class="nav-item" type="button" data-view="history" aria-controls="classicViewHistory" title="履歴"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span class="nav-text"><strong>履歴</strong><small>これまでの整理と元に戻す</small></span></button>
+<button class="nav-item" type="button" data-view="help" aria-controls="classicViewHelp" title="ヘルプ"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4"/><path d="M12 16.8v.1"/></svg><span class="nav-text"><strong>ヘルプ</strong><small>使い方・安全のしくみ</small></span></button>
+</nav>
+<div class="botanical botanical-sidebar" aria-hidden="true"></div>
+<footer class="sidebar-foot">
+<svg class="sidebar-ornament" viewBox="0 0 120 12" aria-hidden="true"><path d="M0 6h44M76 6h44"/><ellipse cx="52" cy="6" rx="6" ry="2.4"/><ellipse cx="68" cy="6" rx="6" ry="2.4"/><circle cx="60" cy="6" r="1.4"/></svg>
+<p class="sidebar-quote">整ったファイルで、<br>心地よい毎日を。</p>
+<p class="sidebar-local"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>このPC内だけで処理します</p>
+<p class="sidebar-edition">Classic Edition<br>{{ brand }} · <span>v{{ version }}</span></p>
+</footer>
+</aside>
+
+<main class="classic-main">
+<div class="botanical botanical-header" aria-hidden="true"></div>
+<div id="errorBanner" class="alert alert-error" role="alert" hidden><div><strong>操作を完了できませんでした</strong><p id="errorMessage"></p></div><button id="closeError" class="icon-button" type="button" aria-label="エラーを閉じる">×</button></div>
+
+<section id="classicViewOrganize" class="view view-organize" aria-labelledby="classicOrganizeHeading">
+<header class="view-header"><div><h1 id="classicOrganizeHeading" tabindex="-1">ファイルを整えて、やさしい時間をつくる</h1><p>散らかったファイルを、見やすく探しやすいフォルダーにまとめます。</p></div></header>
+<nav class="stepper" aria-label="操作手順">
+<div class="step is-active" data-step="1" aria-current="step"><span>1</span><strong>フォルダーと方法を選ぶ</strong></div><div class="step-line" aria-hidden="true"></div>
+<div class="step" data-step="2"><span>2</span><strong>移動先を確認</strong></div><div class="step-line" aria-hidden="true"></div>
+<div class="step" data-step="3"><span>3</span><strong>整理を実行</strong></div>
+</nav>
+
+<section class="card folder-panel settings-card" aria-labelledby="folderHeading">
+<h2 id="folderHeading" class="sr-only">対象フォルダーと整理の設定</h2>
+<div class="field">
+<label for="folderPath" class="field-label">整理したいフォルダー <small id="folderHelp">直下のファイルだけを整理します（サブフォルダーの中は変更しません）</small></label>
+<div class="folder-selector"><input id="folderPath" type="text" placeholder="フォルダーを選択、またはパスを入力" spellcheck="false" aria-describedby="folderHelp"><button id="selectFolderButton" class="button button-secondary" type="button">フォルダーを選択</button><button id="previewButton" class="button button-primary" type="button" disabled>整理予定を見る</button></div>
+</div>
+<div class="settings-row-2">
+<fieldset id="organizationRule" class="rule-group" aria-describedby="ruleHelp">
+<legend class="field-label">整理方法</legend>
+<div class="rule-cards">
+<label class="rule-card"><input type="radio" name="organizationRule" value="extension" checked><strong>拡張子別</strong><small>jpg / pdf ごと</small></label>
+<label class="rule-card"><input type="radio" name="organizationRule" value="type"><strong>ファイル種類別</strong><small>画像 / 文書 ごと</small></label>
+</div>
+<p id="ruleHelp" class="sr-only">どちらの方法でも、ファイル名はそのまま残ります。</p></fieldset>
+<div class="field exclusion-setting"><label for="excludedExtensions" class="field-label">除外する拡張子 <small>任意</small></label>
+<div class="exclusion-row"><input id="excludedExtensions" type="text" placeholder=".exe, .tmp" aria-describedby="exclusionHelp" spellcheck="false"><button id="saveSettings" class="button button-quiet" type="button">設定を保存</button></div>
+<p id="exclusionHelp" class="sr-only">例：.exe, .tmp（カンマ区切り。空欄なら除外しません）</p>
+<p id="settingsStatus" role="status" class="settings-status">プレビュー時にも保存されます</p></div>
+</div>
+</section>
+
+<section class="card canvas preview-card" aria-label="整理のプレビューと結果">
+<p id="appStatus" class="app-status" role="status">整理したいフォルダを選択してください。</p>
+<section id="previewSection" class="pane-section" aria-labelledby="previewHeading">
+<div class="pane-heading"><h2 id="previewHeading">整理のプレビュー</h2><div id="previewBadge" class="count-badge" hidden><strong>0</strong> 件の移動予定</div></div>
+<div id="previewEmpty" class="empty-state">
+<div class="botanical botanical-card" aria-hidden="true"></div>
+<div class="empty-mark"><div class="botanical botanical-sprig" aria-hidden="true"></div><span class="empty-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5V6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7.5Z"/><path d="m10 13 2.2 2.2L16.5 11"/></svg></span></div>
+<h3>まずは、整理予定を確認しましょう</h3>
+<p>フォルダーと整理方法を選び、「整理予定を見る」を押してください。<br>移動先のフォルダーと、移動するファイルがここに表示されます。</p>
+<svg class="empty-ornament" viewBox="0 0 320 14" aria-hidden="true"><path d="M20 7h120M180 7h120"/><ellipse cx="150" cy="7" rx="8" ry="2.8"/><ellipse cx="170" cy="7" rx="8" ry="2.8"/><circle cx="160" cy="7" r="1.6"/><ellipse cx="146" cy="2.5" rx="4.5" ry="1.6" transform="rotate(-25 146 2.5)"/><ellipse cx="174" cy="2.5" rx="4.5" ry="1.6" transform="rotate(25 174 2.5)"/></svg>
+<ul class="assurance"><li>実行前に必ず確認</li><li>同名ファイルは上書きしない</li><li>直前の整理は元に戻せる</li></ul>
+</div>
+<div id="previewContent" hidden>
+<dl class="kpis kpis-4">
+<div class="kpi kpi-primary"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h14m-5-5 5 5-5 5"/><path d="M20 5v14"/></svg><div><dt>移動予定</dt><dd><strong id="planCount">0</strong> 件</dd></div></div>
+<div class="kpi"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg><div><dt>移動先フォルダー</dt><dd><strong id="classicFolderCount">0</strong> 個</dd></div></div>
+<div class="kpi"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8 12h8"/></svg><div><dt>除外設定で対象外</dt><dd id="excludedCount">0 件</dd></div></div>
+<div class="kpi"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 3 20h18Z"/><path d="M12 10v4"/><path d="M12 17v.1"/></svg><div><dt>予定作成時の問題</dt><dd><strong id="previewFailureCount">0</strong> 件</dd></div></div>
+</dl>
+<div class="pane-body">
+<div id="previewNotice" class="alert alert-warning pane-wide" role="status" hidden><strong>確認事項</strong><span id="previewNoticeText"></span></div>
+<div class="pane-split">
+<div class="folder-list"><h3>移動先フォルダー<small id="classicFolderTotal">全0個</small></h3><ul id="classicFolderList" aria-label="移動先フォルダーと件数"></ul></div>
+<div class="table-wrap" tabindex="0" role="region" aria-label="移動予定一覧。スクロールして確認できます"><table class="file-table file-table-3"><caption class="sr-only">ファイルごとの移動予定</caption><thead><tr><th scope="col">ファイル名</th><th scope="col">拡張子</th><th scope="col">移動先</th></tr></thead><tbody id="previewRows"></tbody></table></div>
+</div>
+<div id="previewFailures" class="inline-errors pane-wide" hidden><h3>予定を作成できなかった項目</h3><p>理由を確認し、必要に応じて設定やフォルダーを見直してください。</p><ul id="previewFailureList"></ul></div>
+</div>
+<div class="pane-footer"><p class="safe-note"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8.2 7 10 4-1.8 7-5.5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>同名ファイルは上書きせず、末尾に番号を付けます。実行前に確認画面が表示されます。</p><button id="organizeButton" class="button button-primary button-cta" type="button" disabled>この内容で整理を実行する</button></div>
+</div></section>
+
+<section id="progressSection" class="pane-section progress-panel" aria-labelledby="progressHeading" hidden aria-busy="true">
+<div class="pane-heading"><div><h2 id="progressHeading">ファイルを整理しています</h2><p id="progressStatus" role="status">整理の準備をしています…</p></div></div>
+<div class="progress-body">
+<div class="progress-meta"><span id="currentFile">準備中</span><strong id="progressPercent">0%</strong></div>
+<div class="progress-track" role="progressbar" aria-label="ファイル整理の進捗" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progressBar" class="progress-bar"></div></div>
+<p id="progressCount" class="progress-count">0 / 0 件</p>
+<p class="progress-note">処理が完了するまでお待ちください。ほかの画面を見ていても、整理は続きます。</p>
+<button id="retryProgress" class="button button-secondary" type="button" hidden>処理状況を再確認</button>
+</div>
+</section>
+
+<section id="resultSection" class="pane-section result-panel" aria-labelledby="resultHeading" hidden>
+<div class="result-heading"><span class="result-ring" aria-hidden="true"><span id="resultIcon" class="result-icon">✓</span></span><div><h2 id="resultHeading" tabindex="-1">整理が完了しました</h2><p id="resultDescription" role="status">処理結果を確認してください。</p></div></div>
+<dl class="kpis kpis-3">
+<div class="kpi kpi-primary summary-success"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8 12 3 3 5-6"/></svg><div><dt>移動できたファイル</dt><dd><strong id="successCount">0</strong> 件</dd></div></div>
+<div class="kpi summary-failure"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m9 9 6 6m0-6-6 6"/></svg><div><dt>移動できなかったファイル</dt><dd><strong id="failureCount">0</strong> 件</dd></div></div>
+<div class="kpi"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v16H6Z"/><path d="M9 9h6M9 13h6"/></svg><div><dt>結果の記録数</dt><dd><strong id="processedCount">0</strong> 件</dd></div></div>
+</dl>
+<div class="pane-body pane-split">
+<div class="folder-list"><h3>整理後のフォルダー<small id="classicResultFolderTotal">全0個</small></h3><ul id="classicResultFolderList" aria-label="整理後のフォルダーと件数"></ul></div>
+<div class="result-lists">
+<div id="failureResults" class="result-list result-failures" hidden><h3>移動できなかったファイル</h3><p class="helper-text">理由を確認して問題を解消し、もう一度プレビューしてください。</p><div class="table-wrap" tabindex="0" role="region" aria-label="失敗したファイルと理由"><table class="file-table"><thead><tr><th scope="col">ファイル</th><th scope="col">理由</th></tr></thead><tbody id="failureRows"></tbody></table></div></div>
+<div id="successResults" class="result-list" hidden><div class="table-wrap" tabindex="0" role="region" aria-label="移動結果一覧"><table class="file-table"><caption class="sr-only">移動できたファイル</caption><thead><tr><th scope="col">移動できたファイル</th><th scope="col">移動先</th></tr></thead><tbody id="successRows"></tbody></table></div></div>
+</div>
+</div>
+<div class="pane-footer"><p class="safe-note"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>元に戻す場合は、<button class="link-button" type="button" data-view="history">履歴</button>から操作できます。</p><button id="startOverButton" class="button button-secondary button-large" type="button">別のフォルダーを整理する</button></div>
+</section>
+</section>
+</section>
+
+<section id="classicViewHistory" class="view view-history" aria-labelledby="historyHeading" hidden>
+<header class="view-header"><div><h1 id="historyHeading" tabindex="-1">履歴と元に戻す</h1><p>これまでの整理を確認できます。直前の整理は、ファイルを元の場所へ戻せます。</p></div><button id="refreshHistory" class="button button-quiet" type="button">履歴を更新</button></header>
+<section class="card latest-card history-panel" aria-labelledby="classicLatestTag">
+<div class="latest-main">
+<p id="classicLatestTag" class="latest-tag">直前の整理</p>
+<p id="classicLatestPath" class="latest-path">まだ整理履歴はありません。</p>
+<div id="classicLatestMeta" class="latest-meta"></div>
+</div>
+<div class="undo-action"><button id="undoLatest" class="button button-undo button-large" type="button" disabled>直前の整理を元に戻す</button><p id="undoAvailability" class="helper-text">直前の整理に戻せるファイルがある場合に利用できます。</p></div>
+<div id="undoResult" class="undo-result" role="status" hidden></div>
+</section>
+<section class="card history-list-card" aria-labelledby="classicHistoryListHeading">
+<div class="history-list-head"><h2 id="classicHistoryListHeading">これまでの整理</h2><p>最新50件まで表示します</p></div>
+<div id="historyEmpty" class="history-empty"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg><h3>まだ整理履歴はありません。</h3><p>整理すると、日時・対象フォルダー・結果がここに表示されます。</p></div>
+<div id="historyRows" class="history-list" role="region" tabindex="0" aria-label="最近の整理履歴"></div>
+</section>
+</section>
+
+<section id="classicViewHelp" class="view view-help" aria-labelledby="classicHelpHeading" hidden>
+<header class="view-header"><div><h1 id="classicHelpHeading" tabindex="-1">ヘルプ</h1><p>使い方と、ファイルを守るためのしくみをご案内します。</p></div></header>
+<div class="help-grid">
+<section class="card help-card" aria-labelledby="classicHelpUsage">
+<h2 id="classicHelpUsage">使い方（3ステップ）</h2>
+<ol class="help-steps">
+<li><strong>フォルダーと方法を選ぶ</strong><span>「フォルダーを選択」で整理したいフォルダーを選ぶか、パスを入力します。整理方法（拡張子別 / ファイル種類別）と、必要なら除外する拡張子を指定します。</span></li>
+<li><strong>移動先を確認</strong><span>「整理予定を見る」を押すと、移動するファイルと移動先の一覧が表示されます。この時点ではファイルは移動しません。</span></li>
+<li><strong>整理を実行</strong><span>「この内容で整理を実行する」を押し、確認画面で内容を確かめてから実行します。結果は画面と「履歴」で確認できます。</span></li>
+</ol>
+</section>
+<section class="card help-card" aria-labelledby="classicHelpSafety">
+<h2 id="classicHelpSafety">安全のしくみ</h2>
+<ul class="help-list">
+<li>プレビューではファイルを移動しません。実行の前には必ず確認画面が表示されます。</li>
+<li>同名のファイルがあっても上書きせず、末尾に番号（_1, _2…）を付けます。ファイルを削除することはありません。</li>
+<li>直前の整理は「履歴」から元の場所へ戻せます。戻す前に一覧を確認できます。</li>
+<li>選んだフォルダー直下の、拡張子のあるファイルだけが対象です。サブフォルダーの中・拡張子のないファイル・シンボリックリンクは変更しません。</li>
+<li>処理はすべてこのPC内で行います。ファイルやファイル名、履歴を外部へ送信しません。</li>
+</ul>
+</section>
+<section class="card help-card help-wide" aria-labelledby="classicHelpData">
+<h2 id="classicHelpData">データの保存場所とアンインストール</h2>
+<ul class="help-list">
+<li>設定と整理の履歴は <code>%LOCALAPPDATA%\MOMONGA_Lab\FileOrganizer\</code> に保存されます。ファイルの内容は保存しません。</li>
+<li>この保存場所は標準版（File Organizer）と共用です。どちらの版でも同じ履歴を確認でき、元に戻す操作もできます。データを守るため、2つの版を同時に起動することはできません。</li>
+<li>インストーラーは使いません。アンインストールするには、アプリを終了してから「File Organizer Classic」フォルダーを削除します。</li>
+<li>設定と履歴も消す場合は、上の保存場所のフォルダーも削除します（標準版の履歴も消え、「元に戻す」はできなくなります）。</li>
+</ul>
+</section>
+</div>
+</section>
+</main>
+</div>
+<dialog id="confirmDialog" class="confirm-dialog" aria-labelledby="confirmHeading" aria-describedby="confirmDescription">
+<form method="dialog"><h2 id="confirmHeading">整理を実行しますか？</h2><p id="confirmDescription"><strong id="confirmCount">0件</strong> のファイルを、確認した移動先へ整理します。</p><p class="dialog-note">処理が完了するまでお待ちください。終了操作をした場合も、安全のため完了を待ちます。</p><div class="dialog-actions"><button class="button button-secondary" value="cancel" autofocus>キャンセル</button><button id="confirmStartButton" class="button button-primary" value="default">整理を実行する</button></div></form>
+</dialog>
+<dialog id="undoDialog" class="confirm-dialog" aria-labelledby="undoHeading" aria-describedby="undoDescription">
+<form method="dialog"><h2 id="undoHeading">元の場所に戻しますか？</h2><p id="undoDescription">同名ファイルがある場合や、移動後に変更されたファイルは上書きせず、戻せなかった理由を表示します。</p><p id="undoCount" class="helper-text"></p><ul id="undoFiles" class="undo-files" tabindex="0" aria-label="元に戻す予定一覧"></ul><div class="dialog-actions"><button class="button button-secondary" value="cancel" autofocus>キャンセル</button><button class="button button-undo" value="undo">元に戻す</button></div></form>
+</dialog>
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+<script src="{{ url_for('static', filename='classic/classic.js') }}" defer></script>
+</body></html>

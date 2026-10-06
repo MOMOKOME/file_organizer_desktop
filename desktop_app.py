@@ -9,7 +9,7 @@ from threading import Event, Thread
 
 from werkzeug.serving import make_server
 
-from app_config import APP_NAME, VERSION, resource_path, user_data_directory
+from app_config import DISPLAY_NAME, VERSION, resource_path, user_data_directory
 from local_state import LocalState
 from organizer_service import JobManager
 from web_app import create_app
@@ -189,7 +189,7 @@ def run_desktop(webview, directory=None):
             server.start()
             geometry = fit_window(windows_work_area())
             logging.info("Window geometry: %s", geometry)
-            window = webview.create_window(f"{APP_NAME} {VERSION}", server.url, **geometry)
+            window = webview.create_window(f"{DISPLAY_NAME} {VERSION}", server.url, **geometry)
             window.events.closing += on_closing
             icon = resource_path("icons/app.ico")
             webview.start(gui="edgechromium", debug=False,
@@ -209,7 +209,7 @@ def main():
     except Exception as error:
         logging.exception("Desktop startup failed")
         if os.name == "nt":
-            ctypes.windll.user32.MessageBoxW(None, str(error), APP_NAME, 0x10)
+            ctypes.windll.user32.MessageBoxW(None, str(error), DISPLAY_NAME, 0x10)
         else:
             raise
 

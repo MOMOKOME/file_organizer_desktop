@@ -26,4 +26,5 @@ dist/
 # Local verification output and app data
 .verification-desktop/
 .verification-simple/
+.verification-classic/
 .organizer_data/
